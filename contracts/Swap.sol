@@ -30,6 +30,9 @@ contract NFTSwap {
         uint256 tokenId1,
         uint256 tokenId2
     ) public returns (uint256){
+        require(to != address(0x0), "to address cant be zero");
+        require(contract1 != address(0x0), "contract1 address cant be zero");
+        require(contract2 != address(0x0), "contract2 address cant be zero");
         require(IERC721(contract1).isApprovedForAll(msg.sender, address(this)), "createSwap: need approve your nft usage");
 
         _swapId.increment();
@@ -48,12 +51,15 @@ contract NFTSwap {
     }
 
     function cancelSwap(uint256 swapId) public {
+        require(swapId <= _swapId._value, "swapId less than maximum _swapId");
         require(swaps[swapId].from != address(0x0), "swap not exist");
         require(swaps[swapId].from == msg.sender, "cancel swap can make only owner");
         delete swaps[swapId];
     }
 
     function acceptSwap(uint256 swapId) public {
+        require(swapId <= _swapId._value, "swapId less than maximum _swapId");
+
         Swap memory current = swaps[swapId];
         require(swaps[swapId].from != address(0x0), "swap not exist");
         require(current.to == msg.sender, "accept can make only second user");
