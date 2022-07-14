@@ -61,7 +61,6 @@ contract NFTSwap {
         require(swapId <= _swapId._value, "swapId less than maximum _swapId");
 
         Swap memory current = swaps[swapId];
-        require(swaps[swapId].from != address(0x0), "swap not exist");
         require(current.to == msg.sender, "accept can make only second user");
         require(IERC721(current.contract2).isApprovedForAll(msg.sender, address(this)), "acceptSwap: need approve your nft usage");
 
