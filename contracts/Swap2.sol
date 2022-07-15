@@ -4,10 +4,11 @@ pragma solidity ^0.8.10;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 
 import "hardhat/console.sol";
 
-contract NFTSwap2 {
+contract NFTSwap2 is IERC721Receiver {
     using Counters for Counters.Counter;
 
     Counters.Counter private _swapId;
@@ -97,5 +98,9 @@ contract NFTSwap2 {
         IERC721(current.contract2).safeTransferFrom(address(this), current.user1, current.tokenId2);
 
         delete swaps[swapId];
+    }
+
+    function onERC721Received(address, address, uint256, bytes memory) public virtual override returns (bytes4) {
+        return this.onERC721Received.selector;
     }
 }

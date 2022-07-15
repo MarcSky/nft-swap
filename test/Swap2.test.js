@@ -1,18 +1,18 @@
 const {expect} = require("chai");
 const {ethers} = require("hardhat");
 
-describe("NFTSwap", function () {
+describe("NFTSwap2", function () {
     let owner, user1, user2;
     let nftSwap;
 
     beforeEach(async function () {
         [owner, user1, user2] = await ethers.getSigners();
-        const NFTSwap = await ethers.getContractFactory("NFTSwap", owner);
+        const NFTSwap = await ethers.getContractFactory("NFTSwap2", owner);
         nftSwap = await NFTSwap.deploy();
         await nftSwap.deployed();
     });
 
-    it("swap", async function () {
+    it("swap2", async function () {
         const NFT1 = await ethers.getContractFactory("NFT1", owner);
         const token1 = await NFT1.deploy();
         await token1.deployed();
@@ -24,7 +24,6 @@ describe("NFTSwap", function () {
         await token2.deployed();
         txn = await token2.connect(user2).mint();
         await txn.wait();
-
 
         txn = await token1.connect(user1).setApprovalForAll(nftSwap.address, true);
         txn.wait()
@@ -39,8 +38,22 @@ describe("NFTSwap", function () {
         console.log("token 0 from NFT2 owner:", owner_token2_before);
 
         txn = await nftSwap.connect(user1).createSwap(user2.address, token1.address, token2.address, 0, 0);
-        txn.wait();
-        await nftSwap.connect(user2).acceptSwap(1);
+        txn.wait()
+
+        const swapId = 1;
+
+        txn = await nftSwap.connect(user1).deposit(swapId, token1.address, 0);
+        txn.wait()
+
+        txn = await nftSwap.connect(user2).deposit(swapId, token2.address, 0);
+        txn.wait()
+
+        txn = await nftSwap.connect(user1).acceptSwap(swapId);
+        txn.wait()
+
+        // txn = await nftSwap.connect(user1).createSwap(user2.address, token1.address, token2.address, 0, 0);
+        // txn.wait();
+        // await nftSwap.connect(user2).acceptSwap(1);
 
         let owner_token1_after = await token1.ownerOf(0);
         let owner_token2_after = await token2.ownerOf(0);
